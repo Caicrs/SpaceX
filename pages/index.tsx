@@ -3,13 +3,18 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import logo from "../public/logo.svg";
+import { button1, button2 } from "../src/store/Calculator/calculator.actions";
 
 const Home: NextPage = (response: any) => {
   const initState = response;
   const [launches, setLaunches] = useState(initState.launches);
-  console.log(initState);
+  const ButtonStatus = useSelector(
+    (state: { chooseButton: any }) => state.chooseButton
+  );
+  const dispatch = useDispatch();
   return (
     <Container>
       <Head>
@@ -21,11 +26,19 @@ const Home: NextPage = (response: any) => {
         <Img width={250} height={100} src={logo}></Img>
       </Header>
       <Buttons>
-        <ButtonActive>Launches</ButtonActive>
-        <ButtonOff>Analytics</ButtonOff>
+        {ButtonStatus == 1 ? (
+          <ButtonActive>Launches</ButtonActive>
+        ) : (
+          <ButtonOff onClick={() => dispatch(button1())}>Launches</ButtonOff>
+        )}
+        {ButtonStatus == 1 ? (
+          <ButtonOff onClick={() => dispatch(button2())}>Analytics</ButtonOff>
+        ) : (
+          <ButtonActive>Analytics</ButtonActive>
+        )}
       </Buttons>
 
-      <List>
+        {ButtonStatus == 1 ? <List>
         {launches.map((data: any) => {
           return (
             <Card key={data.id}>
@@ -42,7 +55,9 @@ const Home: NextPage = (response: any) => {
             </Card>
           );
         })}
-      </List>
+      </List> :
+      <h3>Analytics Page</h3>
+      }
 
       <footer>
         <a
@@ -87,6 +102,10 @@ export async function getStaticProps() {
   };
 }
 
+const Text = styled.h6`
+  color: white;
+`;
+
 const Img = styled(Image)`
   margin: 0 auto;
 `;
@@ -124,7 +143,6 @@ const ButtonActive = styled.div`
   border-bottom: 1px solid #dbdbdb;
   padding: 0.5rem 2rem;
   margin: 0 1rem;
-  cursor: pointer;
 `;
 
 const ButtonOff = styled.div`
@@ -144,6 +162,6 @@ const ButtonOff = styled.div`
 
 const Buttons = styled.div`
   display: flex;
-  margin:0 auto;
-  width:fit-content;
+  margin: 0 auto;
+  width: fit-content;
 `;
